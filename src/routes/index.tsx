@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { submitContactForm } from "@/lib/contact.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -1214,6 +1215,9 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 function ConsultSection() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -1225,9 +1229,18 @@ function ConsultSection() {
     },
   });
 
-  function onSubmit(values: ContactFormValues) {
-    console.log("Form submitted:", values);
-    setSubmitted(true);
+  async function onSubmit(values: ContactFormValues) {
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      await submitContactForm({ data: values });
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+      setSubmitError("Có lỗi xảy ra, vui lòng thử lại hoặc gọi trực tiếp cho chúng tôi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
