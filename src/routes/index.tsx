@@ -1386,11 +1386,15 @@ function ConsultSection() {
                       </FormItem>
                     )}
                   />
+                  {submitError && (
+                    <p className="text-rose-400 text-sm text-center">{submitError}</p>
+                  )}
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-90 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="w-full rounded-lg bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-90 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Liên hệ ngay
+                    {isSubmitting ? "Đang gửi..." : "Liên hệ ngay"}
                   </button>
                 </form>
               </Form>

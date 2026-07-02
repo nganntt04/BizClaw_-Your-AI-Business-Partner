@@ -1,7 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { sendContactNotification } from "./mailer";
-import { prisma } from "./prisma";
 
 // Validate lại ở server — không tin tưởng dữ liệu từ client dù đã validate ở form
 const contactServerSchema = z.object({
@@ -14,6 +12,11 @@ const contactServerSchema = z.object({
 export const submitContactForm = createServerFn({ method: "POST" })
   .validator(contactServerSchema)
   .handler(async ({ data }) => {
+    // Import động: đảm bảo Prisma/nodemailer chỉ được load lúc chạy trên server,
+    // không bị Vite quét nhầm vào bundle của trình duyệt.
+    const { prisma } = await import("./prisma");
+    const { sendContactNotification } = await import("./mailer");
+
     const submission = await prisma.contactSubmission.create({
       data: {
         fullName: data.fullName,
